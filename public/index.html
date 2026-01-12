@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QR Generator</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 2rem; max-width: 720px; margin: auto; }
+    input[type="text"] { width: 100%; padding: 0.5rem; font-size: 1rem; }
+    button { margin-top: 0.5rem; padding: 0.6rem 1rem; font-size: 1rem; }
+    img { display: block; margin-top: 1rem; max-width: 100%; height: auto; border: 1px solid #ddd; }
+    .controls { display:flex; gap:0.5rem; margin-top:0.75rem; align-items:center; }
+    label { font-size:0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>QR Generator</h1>
+  <p>Enter text or a URL and click Generate. The QR image will display below; use Download to save it.</p>
+
+  <input id="text" type="text" placeholder="https://example.com" value="https://example.com" />
+  <div class="controls">
+    <label>
+      Size:
+      <select id="size">
+        <option value="200">200</option>
+        <option value="300" selected>300</option>
+        <option value="500">500</option>
+      </select>
+    </label>
+    <button id="generate">Generate</button>
+    <a id="download" style="display:none; margin-left:1rem;">Download</a>
+  </div>
+
+  <img id="preview" alt="QR preview" style="display:none;" />
+
+  <script>
+    const txt = document.getElementById('text');
+    const sizeEl = document.getElementById('size');
+    const gen = document.getElementById('generate');
+    const preview = document.getElementById('preview');
+    const download = document.getElementById('download');
+
+    async function generate() {
+      const text = encodeURIComponent(txt.value || '');
+      const size = sizeEl.value;
+      const url = `/api/generate?text=${text}&size=${size}`;
+
+      gen.disabled = true;
+      gen.textContent = 'Generating...';
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to generate');
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        preview.src = objectUrl;
+        preview.style.display = 'block';
+        download.href = objectUrl;
+        download.download = 'qrcode.png';
+        download.textContent = 'Download';
+        download.style.display = 'inline-block';
+      } catch (err) {
+        alert('Error: ' + (err.message || err));
+      } finally {
+        gen.disabled = false;
+        gen.textContent = 'Generate';
+      }
+    }
+
+    gen.addEventListener('click', generate);
+  </script>
+</body>
+</html>
