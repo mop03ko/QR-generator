@@ -1,0 +1,13 @@
+{
+  "name": "qr-generator-sample",
+  "version": "0.1.0",
+  "description": "Sample QR generator using qrcode package",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.1"
+  },
+  "license": "MIT"
+}
